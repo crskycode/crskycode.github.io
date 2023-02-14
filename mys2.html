@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <title>验证码</title>
+
+    <script src="https://static.geetest.com/static/js/gt.0.4.9.js"></script>
+
+    <style>
+        #app {
+            font-family: Avenir, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 60px;
+        }
+
+        .demoform {
+            margin: 100px auto 0;
+            width: 340px;
+            height: 600px;
+            position: relative;
+        }
+
+        .form {
+            box-sizing: content-box;
+        }
+
+        .inp {
+            background: #ffffff;
+            border: 1px solid #d1d6e0;
+            box-sizing: border-box;
+            border-radius: 4px;
+            margin: 20px 0px;
+            font-size: 0;
+            position: relative;
+            text-align: left;
+        }
+
+        .icon {
+            margin: 15px 0 15px 13px;
+            background-size: 100%;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+        input {
+            width: 278px;
+            font-size: 14px;
+            position: absolute;
+            top: 7px;
+            left: 45px;
+            height: 36px;
+            border: none;
+            border-left: 1px solid #d1d6e0;
+            background-color: #bab1bb00 !important;
+            outline: transparent;
+            text-indent: 5px;
+        }
+
+        textarea {
+            width: 96%;
+            height: 60px;
+            min-height: 40px;
+            resize: vertical;
+        }
+
+        #captcha {
+            height: 50px;
+            margin: 10px 0 10px 0;
+        }
+
+        .login {
+            background: #347eff;
+            border-radius: 4px;
+            margin: 20px 0px;
+            width: 100%;
+            height: 50px;
+            color: white;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="demoform">
+            <form id="form">
+                <div class="inp">
+                    <div class="icon"></div>
+                    <input type="text" id="gt" autocomplete="false" placeholder="GT" />
+                </div>
+                <div class="inp">
+                    <div class="icon"></div>
+                    <input type="text" id="cl" autocomplete="false" placeholder="CHALLENGE" />
+                </div>
+                <div id="captcha">
+                </div>
+                <textarea id="rt" placeholder="验证结果"></textarea>
+                <div>复制上面的命令发给BOT即可完成签到</div>
+                <div class="login" onclick="start()">
+                    开始
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let input = {
+            gt: document.getElementById("gt"),
+            cl: document.getElementById("cl"),
+            rt: document.getElementById("rt"),
+        }
+
+        window.onload = function () {
+            let hash = window.location.hash;
+
+            let data = {
+                gt: hash.match(/g=(.+?);/)?.[1],
+                cl: hash.match(/c=(.+?);/)?.[1],
+            }
+
+            input.gt.value = data.gt || ''
+            input.cl.value = data.cl || ''
+        }
+
+        function start() {
+            let gt = input.gt.value
+            let cl = input.cl.value
+
+            if (!gt || !cl) {
+                alert("请输入验证参数后再试")
+                return
+            }
+
+            initGeetest({
+                gt: gt,
+                challenge: cl,
+                // ?
+            }, function (obj) {
+                obj.appendTo("#captcha")
+
+                obj.onSuccess(function () {
+                    let res = obj.getValidate()
+
+                    input.rt.value = `#sign challenge=${res.geetest_challenge}; validate=${res.geetest_validate}; seccode=${res.geetest_seccode};`
+                    input.rt.focus()
+                    input.rt.select()
+
+                    obj.destroy()
+                })
+
+                obj.onError(function (e) {
+                    obj.destroy()
+                    alert("验证失败")
+                })
+            })
+        }
+    </script>
+</body>
+
+</html>
