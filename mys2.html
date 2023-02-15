@@ -124,8 +124,8 @@
             let hash = window.location.hash;
 
             let data = {
-                gt: hash.match(/g=(.+?);/)?.[1],
-                cl: hash.match(/c=(.+?);/)?.[1],
+                gt: hash.match(/gt=(.+?)(?=;|\s|$)/)?.[1],
+                cl: hash.match(/cl=(.+?)(?=;|\s|$)/)?.[1],
             }
 
             input.gt.value = data.gt || ''
@@ -151,7 +151,7 @@
                 obj.onSuccess(function () {
                     let res = obj.getValidate()
 
-                    input.rt.value = `#sign challenge=${res.geetest_challenge}; validate=${res.geetest_validate}; seccode=${res.geetest_seccode};`
+                    input.rt.value = `#验证 challenge=${res.geetest_challenge} validate=${res.geetest_validate} seccode=${res.geetest_seccode}`
                     input.rt.focus()
                     input.rt.select()
 
